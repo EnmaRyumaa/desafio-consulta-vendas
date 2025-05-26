@@ -1,14 +1,15 @@
 package com.devsuperior.dsmeta.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.devsuperior.dsmeta.dto.SaleMinDTO;
 import com.devsuperior.dsmeta.services.SaleService;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/sales")
@@ -24,9 +25,12 @@ public class SaleController {
 	}
 
 	@GetMapping(value = "/report")
-	public ResponseEntity<?> getReport() {
+	public ResponseEntity<?> getReport(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate minDate,
+									   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate maxDate,
+									   @RequestParam String name) {
 		// TODO
-		return null;
+		List<SaleMinDTO> result = service.getReport(minDate, maxDate, name);
+		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping(value = "/summary")
