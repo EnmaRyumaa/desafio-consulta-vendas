@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
+import com.devsuperior.dsmeta.dto.SellerMinDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,23 +28,29 @@ public class SaleService {
 		return new SaleMinDTO(entity);
 	}
 
-	public Page<SaleMinDTO> getReport(LocalDate minDate, LocalDate maxDate, String name, Pageable page) {
-		return repository.getReport(minDate, maxDate, name, page);
+	public Page<SaleMinDTO> getReport(String minDateStr, String maxDateStr, String sellerName, Pageable pageable) {
+		LocalDate maxDate = (maxDateStr != null) ?
+				LocalDate.parse(maxDateStr) :
+				LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
+
+		LocalDate minDate = (minDateStr != null) ?
+				LocalDate.parse(minDateStr) :
+				maxDate.minusYears(1L);
+
+		String name = (sellerName != null) ? sellerName : "";
+
+		return repository.getReport(minDate, maxDate, name, pageable);
 	}
 
-	public Page<SaleMinDTO> getReport(Pageable page) {
-		LocalDate today = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
-		LocalDate minDate = today.minusYears(1L);
-		return repository.getReport(minDate, today, page);
-	}
+	public List<SellerMinDTO> getSummary(String minDateStr, String maxDateStr) {
+		LocalDate maxDate = (maxDateStr != null) ?
+				LocalDate.parse(maxDateStr) :
+				LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
 
-	public List<SaleMinDTO> getSummary(LocalDate minDate, LocalDate maxDate) {
+		LocalDate minDate = (minDateStr != null) ?
+				LocalDate.parse(minDateStr) :
+				maxDate.minusYears(1L);
+
 		return repository.getSummary(minDate, maxDate);
-	}
-
-	public List<SaleMinDTO> getSummary() {
-		LocalDate today = LocalDate.ofInstant(Instant.now(), ZoneId.systemDefault());
-		LocalDate minDate = today.minusYears(1L);
-		return repository.getSummary(minDate, today);
 	}
 }
