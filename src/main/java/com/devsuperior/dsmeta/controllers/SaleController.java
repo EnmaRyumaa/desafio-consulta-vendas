@@ -1,6 +1,8 @@
 package com.devsuperior.dsmeta.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +27,40 @@ public class SaleController {
 	}
 
 	@GetMapping(value = "/report")
-	public ResponseEntity<?> getReport(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate minDate,
-									   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate maxDate,
-									   @RequestParam String name) {
+	public ResponseEntity<Page<SaleMinDTO>> getReport(
+			@RequestParam(required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate minDate,
+			@RequestParam(required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate maxDate,
+			@RequestParam(required = false) String name) {
 		// TODO
-		List<SaleMinDTO> result = service.getReport(minDate, maxDate, name);
+		Page<SaleMinDTO> result = null;
+		Pageable pageable = null;
+		if (minDate == null && maxDate == null && name == null) {
+
+			result = service.getReport(pageable);
+		} else {
+			result = service.getReport(minDate, maxDate, name, pageable);
+		}
 		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping(value = "/summary")
-	public ResponseEntity<?> getSummary() {
+	public ResponseEntity<List<SaleMinDTO>> getSummary(
+			@RequestParam(required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate minDate,
+			@RequestParam(required = false)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate maxDate
+	) {
 		// TODO
-		return null;
+		List<SaleMinDTO> result = null;
+
+		if (minDate == null && maxDate == null) {
+
+			result = service.getSummary();
+		} else {
+			result = service.getSummary(minDate, maxDate);
+		}
+		return ResponseEntity.ok(result);
 	}
 }
